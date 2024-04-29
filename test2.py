@@ -6,6 +6,8 @@ from xml.etree.ElementTree import parse
 from bs4 import BeautifulSoup
 import tkinter as tk
 from tkinter import ttk
+from tkinter import font
+import datetime
 
 # API 키와 요청 URL
 KEY = '825afc8affaa9a62a0a8e3425a6ce9cd71ab9c95'
@@ -13,6 +15,8 @@ URL_CORP_CODE = 'https://opendart.fss.or.kr/api/corpCode.xml'
 URL_FIN_STATEMENT = 'https://opendart.fss.or.kr/api/fnlttSinglAcnt.xml'
 URL_FIN_STATEMENT_D = 'https://opendart.fss.or.kr/api/fnlttSinglAcntAll.xml'
 
+# 현재 연도를 가져오기
+current_year = datetime.datetime.now().year
 
 def fetch_corp_codes(key):
     """회사 코드 데이터를 받아오고 파싱하는 함수"""
@@ -33,7 +37,7 @@ def prepare_corp_df(root):
     return pd.DataFrame(corp_list, columns=['고유번호', '정식명칭', '종목코드', '최종변경일자'])
 
 
-def get_items(key, corp_code, year, rpt_code):
+def get_items(key, corp_code, year, rpt_code, detail):
     """재무제표 데이터를 가져오는 함수"""
     params = {
         'crtfc_key': key,
@@ -73,7 +77,7 @@ def submit():
     """제출 버튼에 연결된 함수"""
     airline, year, quarter, bsis, detail = airline_cb.get(), year_cb.get(), quarter_cb.get(), bsis_cb.get(), detail_cb.get()
     corp_code, rpt_code, bsis_code = code_translator(corp_df, airline, quarter, bsis, detail)
-    financial_items = get_items(KEY, corp_code, year, rpt_code)
+    financial_items = get_items(KEY, corp_code, year, rpt_code, detail)
     if financial_items:
         fs_item_list = []
         if detail == '단순':
@@ -136,8 +140,8 @@ def submit():
 
 # GUI 설정 및 메인 실행 루프
 root = tk.Tk()
-root.geometry("300x380")
-root.title("재무제표 추출기")
+root.geometry("290x365")
+root.title("Hwi's 재무제표 추출기")
 
 airline_label = ttk.Label(root, text="항공사 선택:")
 airline_label.pack(pady=(10, 0))
@@ -147,9 +151,9 @@ airline_cb.set("대한항공")
 
 year_label = ttk.Label(root, text="연도 선택:")
 year_label.pack(pady=(10, 0))
-year_cb = ttk.Combobox(root, values=[str(y) for y in range(2016, 2025)])
+year_cb = ttk.Combobox(root, values=[str(y) for y in range(2016, current_year + 1)])
 year_cb.pack(pady=5)
-year_cb.set("2023")
+year_cb.set(str(current_year))
 
 quarter_label = ttk.Label(root, text="분기 선택:")
 quarter_label.pack(pady=(10, 0))
@@ -172,6 +176,7 @@ detail_cb.set("단순")
 corp_root = fetch_corp_codes(KEY)
 corp_df = prepare_corp_df(corp_root)
 
-submit_button = ttk.Button(root, text="제출", command=submit)
+
+submit_button = ttk.Button(root, text="추출", command=submit)
 submit_button.pack(pady=(10, 20))
 root.mainloop()
