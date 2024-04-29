@@ -85,7 +85,7 @@ def submit():
         # DataFrame 생성
         fs_df = pd.DataFrame(fs_item_list, columns=[
             '사업 연도', '종목 코드', '보고서 코드', '개별/연결구분', '재무제표구분',
-            #'계정ID','계정상세',
+            '계정ID','계정상세',
             '계정명','당기명', '당기일자', '당기금액', '당기누적금액', '전기명', '전기일자', '전기금액', '전기누적금액',
             '전전기명', '전전기일자', '전전기금액', '통화 단위'])
 
@@ -97,7 +97,9 @@ def submit():
 
         df_result = fs_df[fs_df['재무제표구분'] == bsis_code]
 
-        df_final = pd.DataFrame(df_result, columns=['사업 연도','계정ID','계정상세','계정명','당기명', '당기일자', '당기금액', '당기누적금액',
+        df_final = pd.DataFrame(df_result, columns=['사업 연도',
+                                                    #'계정ID','계정상세',
+                                                    '계정명','당기명', '당기일자', '당기금액', '당기누적금액',
         '전기명', '전기일자', '전기금액', '전기누적금액','전전기명', '전전기일자', '전전기금액', '통화 단위'])
         df_final.to_excel(f'{airline}.{year}.{quarter}.{bsis}.xlsx', index=False)
     else:
